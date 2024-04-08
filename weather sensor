@@ -1,0 +1,51 @@
+#include <SoftwareSerial.h>
+#include "DHT.h"
+#define DHTPIN 13
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+int l=0; 
+SoftwareSerial mySerial(10, 11); // RX, TX
+unsigned long startMillis;  //some global variables available anywhere in the program
+unsigned long currentMillis;
+void setup(){
+  Serial.begin(9600);  
+  mySerial.begin(9600);   
+
+  pinMode(2, INPUT); 
+  pinMode(A0, INPUT); 
+ 
+  Serial.println("Board is connected!!");   
+  dht.begin();
+  startMillis = millis();
+  pinMode(12,OUTPUT);
+  digitalWrite(12,HIGH);
+
+}
+
+void loop()
+{
+l = digitalRead(2);
+currentMillis = millis();
+if (currentMillis - startMillis >= 1000){
+  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+  float moist = analogRead(A0);
+  moist = map(moist, 1024, 100, 0, 100);
+  float h = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+  float t = dht.readTemperature();
+  String temp = String(t);
+  String hum = String(h);
+  String moistt = String(moist);
+  char message1[30];
+  (temp+","+hum+","+"on"+","+moistt).toCharArray(message1,30);
+  char message2[30];
+  (temp+","+hum+","+"off"+","+moistt).toCharArray(message2,30);
+  if(l==1)
+  mySerial.write(message1);
+  else
+  mySerial.write(message2);
+  Serial.println(message1);
+  startMillis = millis();
+}
+delay(500);
+}
