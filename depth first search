@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function to perform Depth-First Search (DFS) and calculate the area of a block here row and col is the position of the cell and rows and cols is the grid
+int dfs(int **grid, int rows, int cols, int row, int col) {
+    // Check if the current cell is out of bounds or already visited 
+    if (row < 0 || row >= rows || col < 0 || col >= cols || grid[row][col] != 1) {
+        return 0;
+    }
+
+    // Initialize area to 1 since the current cell is part of the block
+    int area = 1;
+    grid[row][col] = 0;  // Mark the current cell as visited
+
+    // Recursively call dfs for adjacent cells (down, up, right, left) to explore the connected block
+    area += dfs(grid, rows, cols, row + 1, col);//This line makes a recursive call to the DFS function for the cell located one row down from the current cell.
+    area += dfs(grid, rows, cols, row - 1, col);//Similar to the first line, this recursively explores the cell located one row up from the current cell.
+    area += dfs(grid, rows, cols, row, col + 1);//This line explores the cell located one column to the right of the current cell through a recursive DFS call.
+    area += dfs(grid, rows, cols, row, col - 1);//Similar to the third line, this explores the cell located one column to the left of the current cell.
+
+    return area;  // Return the total area of the connected block
+}
+
+// Function to find the maximum area of a block in the grid
+int maxArea(int **grid, int rows, int cols) {
+    int maxAr = 0;
+
+    // Iterate through each cell in the grid
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) { //iterating through each cell
+            int area = dfs(grid, rows, cols, i, j);  // calls the dfs function for checking
+            maxAr = (area > maxAr) ? area : maxAr;   // Update maxAr if the current area is greater
+        }
+    }
+
+    return maxAr;  // Return the maximum area of a block in the grid
+}
+
+int main() {
+    int rows, cols;
+
+    // Input: Read the number of rows and columns from the user
+    printf("Enter the number of rows and columns:\n");
+    scanf("%d %d", &rows, &cols);
+  if (rows<50&&cols<50) {
+    
+
+    // Dynamically allocate memory for a 2D array (grid)
+    int **grid = (int **)malloc(rows * sizeof(int *));
+    for (int i = 0; i < rows; i++) {
+        grid[i] = (int *)malloc(cols * sizeof(int));
+    }
+
+    // Input: Read the binary matrix values from the user
+    printf("Enter the elements of the matrix:\n");
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            scanf("%d", &grid[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Output: Print the maximum area of a block in the grid
+    printf("Maximum area of a block: %d\n", maxArea(grid, rows, cols));
+
+    // Free the dynamically allocated memory for the grid
+    for (int i = 0; i < rows; i++) {
+        free(grid[i]);
+    }
+    free(grid);
+  }
+  else{
+    printf("enter valid rows and columns less than 50");
+  }
+    return 0;  // End of the program
+}
