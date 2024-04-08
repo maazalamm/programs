@@ -1,0 +1,79 @@
+// Define pin constants for the RGB LEDs
+#define RED_PIN 3
+#define GREEN_PIN 5
+#define BLUE_PIN 6
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial mySerial(11, 10); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  mySerial.begin(9600);
+
+  // Set the pins as OUTPUT
+  pinMode(RED_PIN, OUTPUT);
+  pinMode(GREEN_PIN, OUTPUT);
+  pinMode(BLUE_PIN, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(13, OUTPUT);
+  pinMode(12, OUTPUT);
+  pinMode(4, OUTPUT);
+
+  // Initialize the initial state of pins
+  digitalWrite(4, LOW);
+  digitalWrite(12, LOW);
+  digitalWrite(13, HIGH);
+
+  Serial.println("Board is connected!!");
+}
+
+char variable;
+
+void loop() {
+  // Check if there are characters available in the software serial buffer (mySerial)
+  if (mySerial.available()) {
+    char temp = mySerial.read();
+    variable = temp;
+    Serial.println(variable);
+
+    // Handle different characters received
+    switch (variable) {
+      case 'a':
+        digitalWrite(RED_PIN, HIGH);
+        digitalWrite(GREEN_PIN, HIGH);
+        digitalWrite(BLUE_PIN, HIGH);
+        break;
+      case 'b':
+        digitalWrite(RED_PIN, HIGH);
+        break;
+      case 'c':
+        digitalWrite(GREEN_PIN, HIGH);
+        break;
+      case 'd':
+        digitalWrite(BLUE_PIN, HIGH);
+        break;
+      case 'e':
+        digitalWrite(RED_PIN, LOW);
+        digitalWrite(GREEN_PIN, LOW);
+        digitalWrite(BLUE_PIN, LOW);
+        break;
+      case 'f':
+        digitalWrite(RED_PIN, LOW);
+        break;
+      case 'g':
+        digitalWrite(GREEN_PIN, LOW);
+        break;
+      case 'h':
+        digitalWrite(BLUE_PIN, LOW);
+        break;
+    }
+  }
+
+  // Check if there are characters available in the hardware serial buffer (Serial)
+  if (Serial.available()) {
+    mySerial.write(Serial.read());
+  }
+
+  delay(500); // Introduce a 500 ms delay
+}
