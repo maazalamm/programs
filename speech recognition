@@ -1,0 +1,79 @@
+// Include the SoftwareSerial library for Bluetooth communication
+#include <SoftwareSerial.h>
+
+// Create a SoftwareSerial object for Bluetooth communication on pins 10 (TX) and 11 (RX)
+SoftwareSerial btSerial(10, 11);
+
+// Define pins for the RGB LED
+int redPin = 3;
+int greenPin = 5;
+int bluePin = 6;
+
+// Variables to store color values received via Bluetooth
+int r_value;  // Red component
+int g_value;  // Green component
+int b_value;  // Blue component
+
+// Variable to store the received color string
+String colour;
+
+// Setup function runs once when the Arduino starts
+void setup() {
+  // Begin communication with the Bluetooth module at a baud rate of 9600
+  btSerial.begin(9600);
+
+  // Begin serial communication with the computer at a baud rate of 9600
+  Serial.begin(9600);
+
+  // Set the RGB LED pins as output pins
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+
+  // Set pins 13, 12, and 4 as output pins and set initial states
+  pinMode(13, OUTPUT);  // LED connected to pin 13
+  pinMode(12, OUTPUT);  // Not used (set to LOW)
+  pinMode(4, OUTPUT);   // Not used (set to LOW)
+
+  // Turn on the built-in LED connected to pin 13
+  digitalWrite(12, LOW);
+  digitalWrite(4, LOW);
+  digitalWrite(13, HIGH);
+}
+
+// Loop function runs repeatedly after setup
+void loop() {
+  // Check if there is data available on the Bluetooth serial connection
+  if (btSerial.available()) {
+    // Read the received color string
+    colour = btSerial.readString();
+
+    // Print the received color string to the serial monitor
+    Serial.println("Received" + colour);
+
+    // Find the indices of the commas in the color string
+    int firstCommaIndex = colour.indexOf(',');
+    int secondCommaIndex = colour.indexOf(',', firstCommaIndex + 1);
+    int thirdCommaIndex = colour.indexOf(',', secondCommaIndex + 1);
+
+    // Extract the red, green, and blue components from the color string
+    String red = colour.substring(1, firstCommaIndex);
+    String green = colour.substring(firstCommaIndex + 1, secondCommaIndex);
+    String blue = colour.substring(secondCommaIndex + 1, thirdCommaIndex);
+
+    // Convert the color components from strings to integers and halve their values
+    r_value = red.toInt() / 2;
+    g_value = green.toInt() / 2;
+    b_value = blue.toInt() / 2;
+
+    // Set the analog (PWM) output values for the RGB LED
+    analogWrite(redPin, r_value);
+    analogWrite(greenPin, g_value);
+    analogWrite(bluePin, b_value);
+
+    // Print the RGB values to the serial monitor
+    Serial.println(r_value);
+    Serial.println(g_value);
+    Serial.println(b_value);
+  }
+}
